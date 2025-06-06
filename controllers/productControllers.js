@@ -1,15 +1,21 @@
 const Product = require("../models/productModel");
 const cloudinary = require("../utils/cloudinary");
 
-// CREATE PRODUCT
 const createProduct = async (req, res) => {
   try {
     const { name, category, price } = req.body;
-
-    console.log("req.file:", req.file); // Debug log for file upload
+    console.log("Request body:", req.body);
+    console.log("req.file:", req.file);
 
     if (!req.file) {
+      console.log("Image file missing in request");
       return res.status(400).json({ message: "Image file is required" });
+    }
+
+    console.log("req.user:", req.user);
+    if (!req.user || !req.user._id) {
+      console.log("User not authenticated or user ID missing");
+      return res.status(401).json({ message: "User not authenticated" });
     }
 
     const newProduct = new Product({
@@ -18,16 +24,20 @@ const createProduct = async (req, res) => {
       price,
       image: req.file.path,
       image_public_id: req.file.filename,
-      userId: req.user._id, // Set userId from decoded JWT
+      userId: req.user._id,
     });
 
+    console.log("New product data:", newProduct);
     await newProduct.save();
+    console.log("Product saved successfully");
 
     res.status(201).json({
       message: "Product Created Successfully",
       product: newProduct,
     });
   } catch (error) {
+    console.log("Error creating product:", error.message);
+    console.log("Error stack:", error.stack);
     res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
