@@ -6,6 +6,8 @@ const createProduct = async (req, res) => {
   try {
     const { name, category, price } = req.body;
 
+    console.log("req.file:", req.file); // Debug log for file upload
+
     if (!req.file) {
       return res.status(400).json({ message: "Image file is required" });
     }
@@ -15,7 +17,8 @@ const createProduct = async (req, res) => {
       category,
       price,
       image: req.file.path,
-      image_public_id: req.file.filename, // store Cloudinary public_id
+      image_public_id: req.file.filename,
+      userId: req.user._id, // Set userId from decoded JWT
     });
 
     await newProduct.save();
@@ -25,7 +28,7 @@ const createProduct = async (req, res) => {
       product: newProduct,
     });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error });
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
 
@@ -45,7 +48,6 @@ const updateProduct = async (req, res) => {
       if (existingProduct.image_public_id) {
         await cloudinary.uploader.destroy(existingProduct.image_public_id);
       }
-
       existingProduct.image = req.file.path;
       existingProduct.image_public_id = req.file.filename;
     }
@@ -54,6 +56,7 @@ const updateProduct = async (req, res) => {
     existingProduct.name = name;
     existingProduct.category = category;
     existingProduct.price = price;
+    existingProduct.userId = req.user._id; // Ensure userId is set
 
     await existingProduct.save();
 
@@ -98,8 +101,8 @@ const fetchAllProducts = async (req, res) => {
       message: "Products fetched successfully",
       products,
     });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -116,8 +119,8 @@ const fetchSingleProduct = async (req, res) => {
       message: "Product fetched successfully",
       product,
     });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
