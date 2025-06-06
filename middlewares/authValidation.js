@@ -7,7 +7,7 @@ const signupValidation = (req, res, next) => {
         password: Joi.string().min(6).max(24).required()
     })
 
-    const {error} = signupValidationSchema.validate();
+    const {error} = signupValidationSchema.validate(req.body);
 
     if(error){
         res.status(404).json({
@@ -25,7 +25,7 @@ const loginValidation = (req, res, next) => {
         password: Joi.string().min(6).max(24).required()
     })
 
-    const {error} = signupValidationSchema.validate();
+    const {error} = signupValidationSchema.validate(req.body);
 
     if(error){
         res.status(404).json({
