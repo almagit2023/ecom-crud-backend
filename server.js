@@ -5,9 +5,10 @@ const PORT = process.env.PORT;
 const cors = require('cors');
 
 const MONGO_URL_LOCAL = process.env.MONGO_URL_LOCAL;
+const MONGO_URL_REMOTE = process.env.MONGO_URL_REMOTE;
 
 const connectMongo = require('./db/db');
-connectMongo(MONGO_URL_LOCAL);
+connectMongo(MONGO_URL_REMOTE);
 
 // We need to mount this two middlewares for seameless integration
 app.use(cors());
